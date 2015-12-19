@@ -1,6 +1,7 @@
 import Redux from 'redux';
-//import { combineReducers } from 'redux';
+import { combineReducers } from 'redux';
 import { createStore } from 'redux';
+import { Component } from 'react';
 //import { applyMiddleware } from 'redux';
 
 console.log("ekkek");
@@ -33,24 +34,6 @@ const visibilityFilter = (
     }
 };
 
-const combineReducers = (reducers) => {
-    console.log("RED", reducers);
-    console.log("RED keys", Object.keys(reducers));
-    return (state = {}, action) => {
-        return Object.keys(reducers).reduce(
-            (nextState, key) => {
-                console.log("nextState and key", nextState, key);
-                nextState[key] = reducers[key](
-                    state[key],
-                    action
-                );
-                return nextState;
-            },
-            {}
-        )
-    };
-};
-
 const todoApp = combineReducers({
     todos,
     visibilityFilter
@@ -58,45 +41,16 @@ const todoApp = combineReducers({
 
 const store = createStore(todoApp);
 
-store.dispatch({
-    type: 'ADD_TODO',
-    id: 0,
-    text: 'Learn redux'
-});
-
-const testAddTodo = () => {
-    const stateBefore = [];
-    const action = {
-        type: 'ADD_TODO',
-        id: 0,
-        text: 'Learn redux'
-    };
-    const stateAfter = [
-        {
-            completed: false,
-            id: 0,
-            text: 'Learn redux'
-        }
-    ];
-    deepFreeze(stateBefore);
-    deepFreeze(action);
-
-    console.log("init state:");
-    console.log(store.getState());
-
-    console.log("set filter...")
-    store.dispatch({
-        type: 'SET_VISIBILITY_FILTER',
-        filter: 'SHOW_COMPLETED'
-    });
-
-    console.log("init state 2:");
-    console.log(store.getState());
-
-    expect(
-        todos(stateBefore, action)
-    ).toEqual(stateAfter);
+const render = () => {
+    ReactDOM.render(
+        <TodoApp />,
+        document.getElementById('root')
+    );
 };
 
-testAddTodo();
-console.log("all tests passed!");
+//store.dispatch({
+//    type: 'ADD_TODO',
+//    id: 0,
+//    text: 'Learn redux'
+//});
+//
