@@ -1,5 +1,5 @@
 import Redux from 'redux';
-import { combineReducers } from 'redux';
+//import { combineReducers } from 'redux';
 import { createStore } from 'redux';
 //import { applyMiddleware } from 'redux';
 
@@ -31,6 +31,24 @@ const visibilityFilter = (
         default:
             return state;
     }
+};
+
+const combineReducers = (reducers) => {
+    console.log("RED", reducers);
+    console.log("RED keys", Object.keys(reducers));
+    return (state = {}, action) => {
+        return Object.keys(reducers).reduce(
+            (nextState, key) => {
+                console.log("nextState and key", nextState, key);
+                nextState[key] = reducers[key](
+                    state[key],
+                    action
+                );
+                return nextState;
+            },
+            {}
+        )
+    };
 };
 
 const todoApp = combineReducers({
