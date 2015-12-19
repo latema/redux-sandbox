@@ -1,10 +1,9 @@
 import Redux from 'redux';
 import { combineReducers } from 'redux';
 import { createStore } from 'redux';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { Component } from 'react';
-//import { applyMiddleware } from 'redux';
-
-console.log("ekkek");
 
 const todos = (state = {}, action) => {
     switch (action.type) {
@@ -41,12 +40,48 @@ const todoApp = combineReducers({
 
 const store = createStore(todoApp);
 
-const render = () => {
+let nextTodoId = 0;
+
+class TodoApp extends Component {
+    render() {
+        console.log("perkrekrk:", this.props.todos);
+        return (
+            <div>
+                <button onClick={() => {
+                store.dispatch({
+                    type: 'ADD_TODO',
+                    text: 'Test',
+                    id: nextTodoId++
+                });
+              }}>
+                    Add Todo
+                </button>
+                <ul>
+                    // todos are not a map... to be fixed
+                    {this.props.todos.map(todo =>
+                        <li key={todo.id}>
+                            {todo.next}
+                        </li>
+                    )}
+                </ul>
+            </div>
+        );
+    }
+}
+
+const render = (rootEl) => {
     ReactDOM.render(
-        <TodoApp />,
-        document.getElementById('root')
+        <TodoApp
+        todos={store.getState().todos}
+        />,
+        rootEl
     );
 };
+
+store.subscribe(render);
+let domEl = document.getElementById('root');
+console.log("D", document.getElementsByTagName("text"));
+render(domEl);
 
 //store.dispatch({
 //    type: 'ADD_TODO',
