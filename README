@@ -1,0 +1,9 @@
+COMMANDS RUN to init sandbox: 
+npm init
+npm install --save-dev react webpack react-router react-hot-loader webpack-dev-server babel-loader redux
+
+source:
+http://jmfurlott.com/tutorial-setting-up-a-single-page-react-web-app-with-react-router-and-webpack/
+
+webpack dev server basic setup:
+https://webpack.github.io/docs/webpack-dev-server.html
