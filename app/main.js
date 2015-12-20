@@ -1,21 +1,42 @@
-import Redux from 'redux';
 import { combineReducers } from 'redux';
 import { createStore } from 'redux';
-import React from 'react';
 import ReactDOM from 'react-dom';
 import { Component } from 'react';
+import React from 'react';
 
-const todos = (state = {}, action) => {
+const todo = (state, action) => {
+    switch (action.type) {
+        case 'ADD_TODO':
+            return {
+                id: action.id,
+                text: action.text,
+                completed: false
+            };
+        case 'TOGGLE_TODO':
+            if (state.id !== action.id) {
+                return state;
+            }
+
+            return {
+                ...state,
+                completed: !state.completed
+            };
+        default:
+            return state;
+    }
+};
+
+const todos = (state = [], action) => {
     switch (action.type) {
         case 'ADD_TODO':
             return [
                 ...state,
-                {
-                    id: action.id,
-                    text: action.text,
-                    completed: false
-                }
+                todo(undefined, action)
             ];
+        case 'TOGGLE_TODO':
+            return state.map(t =>
+                todo(t, action)
+            );
         default:
             return state;
     }
@@ -57,8 +78,8 @@ class TodoApp extends Component {
                     Add Todo
                 </button>
                 <ul>
-                    // todos are not a map... to be fixed
-                    {this.props.todos.map(todo =>
+                    // todos are not an array... to be fixed
+                  {this.props.todos.map(todo =>
                         <li key={todo.id}>
                             {todo.next}
                         </li>
@@ -69,19 +90,17 @@ class TodoApp extends Component {
     }
 }
 
-const render = (rootEl) => {
+const render = () => {
     ReactDOM.render(
         <TodoApp
         todos={store.getState().todos}
         />,
-        rootEl
+        document.getElementById('root')
     );
 };
 
 store.subscribe(render);
-let domEl = document.getElementById('root');
-console.log("D", document.getElementsByTagName("text"));
-render(domEl);
+render();
 
 //store.dispatch({
 //    type: 'ADD_TODO',

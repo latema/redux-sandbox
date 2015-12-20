@@ -20,7 +20,7 @@ module.exports = {
                 // Options to configure babel with
                 query: {
                     plugins: ['transform-runtime', 'transform-react-jsx'],
-                    presets: ['es2015', 'react'] // removed 'react'
+                    presets: ['es2015', 'react', 'stage-2']
                 }
             }
         ],
