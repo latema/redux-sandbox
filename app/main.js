@@ -53,14 +53,19 @@ const todos = (state = [], action) => {
 };
 
 const visibilityFilter = (
-    state = 'SHOW_ALL',
+    state,
     action
 ) => {
     switch (action.type) {
-        case 'SET_VISIBILITY_FILTER':
-            return action.filter;
+        case 'FILTER_CATEGORY':
+            return {
+                "type": action.type,
+                "text": action.text
+            };
         default:
-            return state;
+            return {
+                "type": 'SHOW_ALL'
+            };
     }
 };
 
@@ -71,49 +76,26 @@ const todoApp = combineReducers({
 
 const store = createStore(todoApp);
 
-const FilterLink = ({
-    filter,
-    currentFilter,
-    children
-}) => {
-    if (filter === currentFilter) {
-        return <span>{children}</span>
-    }
-    return (
-        <a href='#'
-           onClick={e => {
-           e.preventDefault();
-           store.dispatch({
-            type: 'SET_VISIBILITY_FILTER',
-            filter
-           });
-       }}
-       >
-       {children}
-       </a>
-    );
-};
-
+// filter equals visibilityFilter...
 const getVisibleTodos = (
     todos,
     filter
 ) => {
-    switch (filter) {
+    switch (filter.type) {
         case 'SHOW_ALL':
             return todos.filter(t => {
                 return t.quantity > 0
             });
-        case 'SHOW_COMPLETED':
-            return todos.filter(
-                t => t.completed
-            );
+        case 'FILTER_CATEGORY':
+            return todos.filter(t => {
+                return t.text  === filter.text
+            });
         case 'SHOW_ACTIVE':
             return todos.filter(
                 t => !t.completed
             );
     }
-}
-
+};
 
 let nextTodoId = 0;
 
@@ -142,6 +124,19 @@ class TodoApp extends Component {
               }}>
                     Add Todo
                 </button>
+                <input ref={node => {
+                    this.filterInput = node;
+                }} />
+                <button onClick={() => {
+                store.dispatch({
+                    type: 'FILTER_CATEGORY',
+                    text: this.filterInput.value
+                });
+                this.filterInput.value = '';
+              }}>
+                    Filter Todos
+                </button>
+
                 <ul>
                     {visibleTodos.map(todo =>
                         <li key={todo.id}
@@ -172,30 +167,6 @@ class TodoApp extends Component {
                         </li>
                     )}
                 </ul>
-                <p>
-                    Show:
-                    {' '}
-                    <FilterLink
-                        filter='SHOW_ALL'
-                        currentFilter={visibilityFilter}
-                    >
-                        All
-                        </FilterLink>
-                    {' '}
-                    <FilterLink
-                        filter='SHOW_ACTIVE'
-                        currentFilter={visibilityFilter}
-                    >
-                        Active
-                    </FilterLink>
-                    {' '}
-                    <FilterLink
-                        filter='SHOW_COMPLETED'
-                        currentFilter={visibilityFilter}
-                    >
-                        Completed
-                    </FilterLink>
-                </p>
             </div>
         );
     }
