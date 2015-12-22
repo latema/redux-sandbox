@@ -4,13 +4,14 @@ import ReactDOM from 'react-dom';
 import { Component } from 'react';
 import React from 'react';
 
-const todo = (state, action) => {
+const todo = (state, action, newQuantity, oldId) => {
     switch (action.type) {
         case 'ADD_TO_CATEGORY':
             return {
-                id: action.id,
+                id: oldId || action.id,
+                //id: action.id,
                 text: action.text,
-                quantity: 1
+                quantity: newQuantity || 1
             };
         case 'DEL_FROM_CATEGORY':
             return {
@@ -26,12 +27,26 @@ const todo = (state, action) => {
 const todos = (state = [], action) => {
     switch (action.type) {
         case 'ADD_TO_CATEGORY':
-            var foundTodo = state.filter(todo => {
-                return todo.text === action.text;
-            });
-            if (foundTodo.length) {
-                foundTodo[0].quantity++;
-                return state;
+
+            var todoIndex = -1;
+            for (var i = 0; i < state.length; i++) {
+                if (state[i].text === action.text) {
+                    todoIndex = i;
+                    break;
+                }
+            }
+
+            if (todoIndex > -1) {
+                var foundTodo = state[i];
+                return [
+                    ...state.slice(0, i),
+                    todo(undefined, {
+                        text: action.text,
+                        type: 'ADD_TO_CATEGORY',
+                        id: foundTodo.id
+                    }, foundTodo.quantity+1, foundTodo.id),
+                    ...state.slice(i+1)
+                ];
             } else {
                 return [
                     ...state,
@@ -40,12 +55,18 @@ const todos = (state = [], action) => {
             }
         case 'DEL_FROM_CATEGORY':
             deepFreeze(state);
-            var intermediateState = state.filter(todo => {
-                return todo.id !== action.id;
-            });
 
-            return [...intermediateState,
-                todo(undefined, action)
+            var todoRemIndex = -1;
+            for (var i = 0; i < state.length; i++) {
+                if (state[i].id === action.id) {
+                    todoRemIndex = i;
+                    break;
+                }
+            }
+
+            return [...state.slice(0, todoRemIndex),
+                todo(undefined, action),
+                ...state.slice(todoRemIndex+1)
             ];
         default:
             return state;
@@ -88,12 +109,8 @@ const getVisibleTodos = (
             });
         case 'FILTER_CATEGORY':
             return todos.filter(t => {
-                return t.text  === filter.text
+                return t.text.indexOf(filter.text) !== -1 && t.quantity > 0
             });
-        case 'SHOW_ACTIVE':
-            return todos.filter(
-                t => !t.completed
-            );
     }
 };
 
@@ -129,7 +146,7 @@ class TodoApp extends Component {
                 }} />
                 <button onClick={() => {
                 store.dispatch({
-                    type: 'FILTER_CATEGORY',
+                    type: this.filterInput.value === '' ? 'SHOW_ALL' : 'FILTER_CATEGORY',
                     text: this.filterInput.value
                 });
                 this.filterInput.value = '';
