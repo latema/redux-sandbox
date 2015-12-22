@@ -22,6 +22,10 @@ module.exports = {
                     plugins: ['transform-runtime', 'transform-react-jsx'],
                     presets: ['es2015', 'react', 'stage-2']
                 }
+            },
+            {
+                test: /\.less$/,
+                loader: 'style!css!less'
             }
         ],
         resolve: {
